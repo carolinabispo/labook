@@ -39,8 +39,8 @@ CREATE Table
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         creator_id TEXT NOT NULL,
         content TEXT UNIQUE NOT NULL,
-        likes NUMBER NOT NULL,
-        dislikes_numbers NOT NULL,
+        likes REAL NOT NULL,
+        dislikes_numbers REAL NOT NULL,
         created_at DATETIME DEFAULT (
             strftime(
                 '%Y-%m-%d %H:%M:%S',
