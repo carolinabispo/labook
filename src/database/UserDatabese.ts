@@ -44,4 +44,10 @@ export class UserDatabase extends BaseDatabase {
         role: newUser.role,
       });
   }
+
+  public async deleteUser(id:string){
+    await BaseDatabase.connection(UserDatabase.TABLE_USERS)
+    .where({id})
+    .delete()
+  }
 }
