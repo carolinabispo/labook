@@ -1,4 +1,4 @@
-import { UserDatabase } from "./../database/UserDatabese";
+import { UserDatabase } from "../database/UserDatabase";
 import { User } from "../models/Users";
 import { TUserDB } from "../types";
 

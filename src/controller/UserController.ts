@@ -14,6 +14,7 @@ export class UserController {
       const response = await userBussiness.getUsers(input);
 
       res.status(200).send(response);
+
     } catch (error) {
       if (req.statusCode === 200) {
         res.status(500);
@@ -42,6 +43,7 @@ export class UserController {
       const response = await userBussiness.createUsers(input);
 
       res.status(201).send({ message: "Novo usuário criado", response });
+      
     } catch (error) {
       if (error instanceof Error) {
         res.send(error.message);
