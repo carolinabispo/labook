@@ -1,4 +1,5 @@
 import { PostDataBase } from "../database/PostDatabase";
+import { BadRequestError } from "../errors/BadRequestError";
 import { Post } from "../models/Posts";
 import { TPosts } from "../types";
 
@@ -27,33 +28,28 @@ export class PostBussiness {
   public createPosts = async (input: any) => {
     const { id, creator_id, content, likes, dislikes_numbers } = input;
 
-    if (typeof id !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("ID invalido");
+    if (typeof id !== "string" || id.length < 4) {
+      throw new BadRequestError(
+        "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
+      );
     }
 
-    if (creator_id < 3) {
-      //   res.statusCode = 404;
-      throw new Error("Nome de usuário deve possuir pelo menos 3 caracteres");
+    if (typeof creator_id !== "string") {
+      throw new BadRequestError("O campo 'creatorId' deve ser uma string");
     }
 
-    if (typeof content !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("Conteúdo inválido");
+    if (typeof content !== "string" || content.length < 1) {
+      throw new BadRequestError(
+        `O campo 'content' deve ter pelo menos 1 caracter.`
+      );
     }
 
     if (typeof likes !== "number") {
-      //   res.statusCode = 404;
-      throw new Error("likes deve ser número");
-    }
-    if (likes < 0) {
-      //   res.statusCode = 404;
-      throw new Error("likes não pode ser negativo");
+      throw new BadRequestError(`O campo 'likes' deve ser um número`);
     }
 
     if (typeof dislikes_numbers !== "number") {
-      //   res.statusCode = 404;
-      throw new Error("dislikesNumbers invalida");
+      throw new BadRequestError(`O campo 'likes' deve ser um número`);
     }
 
     // instanciando novo objeto
@@ -61,7 +57,7 @@ export class PostBussiness {
     const postDBExists = await postDatabase.findPostById(id);
 
     if (postDBExists) {
-    //   res.status(400);
+      //   res.status(400);
       throw new Error("'id' já existe");
     }
 
@@ -90,64 +86,32 @@ export class PostBussiness {
   };
 
   public updatePosts = async (input: any) => {
-    const { id, creatorId, content, likes, dislikesNumbers } =
-      input;
+    const { id, creatorId, content, likes, dislikesNumbers } = input;
 
-    if (id !== undefined) {
-      if (typeof id !== "string") {
-        // res.status(400);
-        throw new Error("'id' deve ser string");
-      }
-      if (id.length < 3) {
-        // res.status(400);
-        throw new Error("'id' deve possuir no mínimo 3 caractere");
-      }
+    if (typeof id !== "string" || id.length < 4) {
+      throw new BadRequestError(
+        "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
+      );
     }
 
-    if (creatorId !== undefined) {
-      if (typeof creatorId !== "string") {
-        // res.status(400);
-        throw new Error("'creator' deve ser string");
-      }
-
-      if (creatorId.length < 2) {
-        // res.status(400);
-        throw new Error("'creator' deve possuir no mínimo 2 caracteres");
-      }
+    if (typeof creatorId !== "string" || creatorId.length < 3) {
+      throw new BadRequestError(
+        "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
+      );
     }
 
-    if (content !== undefined) {
-      if (typeof content !== "string") {
-        // res.status(400);
-        throw new Error("'Conteudo' deve ser string");
-      }
-
-      if (content.length < 2) {
-        // res.status(400);
-        throw new Error("'COnteuto' deve possuir no mínimo 2 caracteres");
-      }
+    if (typeof content !== "string" || content.length < 1) {
+      throw new BadRequestError(
+        `O campo 'content' deve ter pelo menos 1 caracter.`
+      );
     }
 
-    if (likes !== undefined) {
-      if (typeof likes !== "number") {
-        // res.status(400);
-        throw new Error("'Likes' deve ser string");
-      }
-      if (likes < 0) {
-        // res.status(400);
-        throw new Error("'Likes' não pode ser negativo");
-      }
+    if (typeof likes !== "number") {
+      throw new BadRequestError(`O campo 'likes' deve ser um número`);
     }
 
-    if (dislikesNumbers !== undefined) {
-      if (typeof dislikesNumbers !== "number") {
-        // res.status(400);
-        throw new Error("'Dislikes' deve ser string");
-      }
-      if (dislikesNumbers < 0) {
-        // res.status(400);
-        throw new Error("'Dislikes' não pode ser negativo");
-      }
+    if (typeof dislikesNumbers !== "number") {
+      throw new BadRequestError(`O campo 'likes' deve ser um número`);
     }
 
     const postDatabase = new PostDataBase();
@@ -169,12 +133,11 @@ export class PostBussiness {
     return postDBExists;
   };
 
-  public deletePosts = async (input :any) => {
-  
+  public deletePosts = async (input: any) => {
     const { id } = input;
 
     if (typeof id !== "string") {
-      throw new Error("O campo 'id' deve ser umas string");
+      throw new BadRequestError("O campo 'id' deve ser umas string");
     }
 
     const postDatabase = new PostDataBase();
@@ -187,9 +150,5 @@ export class PostBussiness {
     await postDatabase.deletePost(id);
 
     return postDBExists;
-  
-
-
-    
-  }
+  };
 }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PostBussiness } from "../bussiness/PostBussiness";
+import { BaseError } from "../errors/BaseError";
 
 export class PostController {
   public getPosts = async (req: Request, res: Response) => {
@@ -19,10 +20,10 @@ export class PostController {
         res.status(500);
       }
 
-      if (error instanceof Error) {
-        res.send(error.message);
+      if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message);
       } else {
-        res.send("Erro inesperado");
+        res.status(500).send("Erro inesperado");
       }
     }
   };
@@ -42,10 +43,16 @@ export class PostController {
 
       res.status(201).send(response);
     } catch (error) {
-      if (error instanceof Error) {
-        res.send(error.message);
+      console.log(error);
+
+      if (req.statusCode === 200) {
+        res.status(500);
+      }
+
+      if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message);
       } else {
-        res.send("Erro inesperado");
+        res.status(500).send("Erro inesperado");
       }
     }
   };
@@ -65,10 +72,16 @@ export class PostController {
 
       res.status(201).send({ message: "atualizado com sucesso", response });
     } catch (error) {
-      if (error instanceof Error) {
-        res.send(error.message);
+      console.log(error);
+
+      if (req.statusCode === 200) {
+        res.status(500);
+      }
+
+      if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message);
       } else {
-        res.send("Erro inesperado");
+        res.status(500).send("Erro inesperado");
       }
     }
   };
@@ -81,12 +94,16 @@ export class PostController {
       const postBussiness = new PostBussiness();
       const response = await postBussiness.deletePosts(input);
 
-      res
-        .status(200)
-        .send(`Post deletado com sucesso!!`);
+      res.status(200).send(`Post deletado com sucesso!!`);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).send(error.message);
+      console.log(error);
+
+      if (req.statusCode === 200) {
+        res.status(500);
+      }
+
+      if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message);
       } else {
         res.status(500).send("Erro inesperado");
       }

@@ -1,4 +1,5 @@
 import { UserDatabase } from "../database/UserDatabase";
+import { BadRequestError } from "../errors/BadRequestError";
 import { User } from "../models/Users";
 import { TUserDB } from "../types";
 
@@ -26,34 +27,33 @@ export class UserBussiness {
   public createUsers = async (input: any) => {
     const { id, name, email, password, role } = input;
 
-    if (typeof id !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("ID invalido");
+    if (typeof id !== "string" || id.length < 3) {
+      throw new BadRequestError(
+        "O campo 'id' deve ser uma string com pelo menos 3 caracteres"
+      );
     }
 
-    if (name.length < 3) {
-      //   res.statusCode = 404;
-      throw new Error("Nome de usuário deve possuir pelo menos 3 caracteres");
+    if (typeof name !== "string" || name.length < 3) {
+      throw new BadRequestError(
+        "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
+      );
     }
 
-    if (typeof name !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("Nome de usuário invalido");
+    if (!email || !email.includes("@")) {
+      throw new BadRequestError(
+        `O campo 'email' deve ser um endereço de e-mail válido`
+      );
     }
 
-    if (typeof email !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("Email invalido");
+    if (typeof password !== "string" || password.length < 6) {
+      throw new BadRequestError(
+        `O campo 'password' deve ter pelo menos 6 caracteres.`
+      );
     }
-
-    if (typeof password !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("Senha invalida");
-    }
-
-    if (typeof role !== "string") {
-      //   res.statusCode = 404;
-      throw new Error("Role invalida");
+    if (typeof role !== "string" || role.length < 4) {
+      throw new BadRequestError(
+        `O campo 'role' deve ser uma string com pelo menos 4 caracteres`
+      );
     }
 
     // instanciando novo objeto
@@ -91,46 +91,33 @@ export class UserBussiness {
   public updateUsers = async (input: any) => {
     const { newId, newName, newEmail, newPassword, newRole } = input;
 
-    if (newId !== undefined) {
-      if (typeof newId !== "string") {
-        // res.status(400);
-        throw new Error("'id' deve ser string");
-      }
-
-      if (newId.length < 1) {
-        // res.status(400);
-        throw new Error("'id' deve possuir no mínimo 1 caractere");
-      }
+    if (typeof newId !== "string" || newId.length < 4) {
+      throw new BadRequestError(
+        "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
+      );
     }
 
-    if (newName !== undefined) {
-      if (typeof newName !== "string") {
-        // res.status(400);
-        throw new Error("'name' deve ser string");
-      }
-
-      if (newName.length < 2) {
-        // res.status(400);
-        throw new Error("'name' deve possuir no mínimo 2 caracteres");
-      }
+    if (typeof newPassword !== "string" || newName.length < 3) {
+      throw new BadRequestError(
+        "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
+      );
     }
 
-    if (newEmail !== undefined) {
-      if (typeof newEmail !== "string") {
-        // res.status(400);
-        throw new Error("'name' deve ser string");
-      }
+    if (!newEmail || !newEmail.includes("@")) {
+      throw new BadRequestError(
+        `O campo 'email' deve ser um endereço de e-mail válido`
+      );
     }
 
     if (typeof newPassword !== "string" || newPassword.length < 6) {
-      throw new Error(`O campo 'password' deve ter pelo menos 6 caracteres.`);
+      throw new BadRequestError(
+        `O campo 'password' deve ter pelo menos 6 caracteres.`
+      );
     }
-
-    if (newRole !== undefined) {
-      if (typeof newRole !== "string") {
-        // res.status(400);
-        throw new Error("'Role' deve ser number");
-      }
+    if (typeof newRole !== "string" || newRole.length < 4) {
+      throw new BadRequestError(
+        `O campo 'role' deve ser uma string com pelo menos 4 caracteres`
+      );
     }
 
     const userDatabase = new UserDatabase();
@@ -153,11 +140,10 @@ export class UserBussiness {
   };
 
   public deleteUsers = async (input: any) => {
-  
     const { id } = input;
 
     if (typeof id !== "string") {
-      throw new Error("O campo 'id' deve ser umas string");
+      throw new BadRequestError("O campo 'id' deve ser umas string");
     }
 
     const userDatabase = new UserDatabase();
