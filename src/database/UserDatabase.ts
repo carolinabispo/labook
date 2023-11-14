@@ -9,14 +9,14 @@ export class UserDatabase extends BaseDatabase {
     let usersDB;
 
     if (q) {
-      const result: TUserDB[] = await BaseDatabase.connection(UserDatabase.TABLE_USERS).where(
-        "name",
-        "LIKE",
-        `%${q}%`
-      );
+      const result: TUserDB[] = await BaseDatabase.connection(
+        UserDatabase.TABLE_USERS
+      ).where("name", "LIKE", `%${q}%`);
       usersDB = result;
     } else {
-      const result: TUserDB[] = await BaseDatabase.connection(UserDatabase.TABLE_USERS);
+      const result: TUserDB[] = await BaseDatabase.connection(
+        UserDatabase.TABLE_USERS
+      );
       usersDB = result;
     }
     return usersDB;
@@ -25,8 +25,7 @@ export class UserDatabase extends BaseDatabase {
   public async findUserById(id: string) {
     const [userDB]: TUserDB[] | undefined[] = await BaseDatabase.connection(
       UserDatabase.TABLE_USERS
-    )
-    .where({ id });
+    ).where({ id });
 
     return userDB;
   }
@@ -46,9 +45,9 @@ export class UserDatabase extends BaseDatabase {
       });
   }
 
-  public async deleteUser(id:string){
+  public async deleteUser(id: string) {
     await BaseDatabase.connection(UserDatabase.TABLE_USERS)
-    .where({id})
-    .delete()
+      .where({ id })
+      .delete();
   }
 }
