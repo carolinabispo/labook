@@ -1,7 +1,14 @@
+import { DeletePostInputDTO } from './../dtos/deletePost.dto';
+import { CreatePostSchema } from '../dtos/createPost.dto';
 import { PostDataBase } from "../database/PostDatabase";
+import { CreatePostInputDTO, CreatePostOutputDTO } from "../dtos/createPost.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { Post } from "../models/Posts";
 import { TPosts } from "../types";
+import { EditPostInputDTO, EditPostOutputDTO } from '../dtos/editPost.dto';
+import { EditUserOutputDTO } from '../dtos/editUser.dto';
+import { NotFoundError } from '../errors/NotFoundError';
+import { DeletePostOutputDTO } from '../dtos/deletePost.dto';
 
 export class PostBussiness {
   public getPosts = async (input: any) => {
@@ -25,48 +32,47 @@ export class PostBussiness {
     return postsDB;
   };
 
-  public createPosts = async (input: any) => {
-    const { id, creator_id, content, likes, dislikes_numbers } = input;
+  public createPosts = async (input: CreatePostInputDTO): Promise<CreatePostOutputDTO> => {
+    const { id, creatorId, content, likes, dislikesNumbers } = input;
 
-    if (typeof id !== "string" || id.length < 4) {
-      throw new BadRequestError(
-        "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
-      );
-    }
+    // if (typeof id !== "string" || id.length < 4) {
+    //   throw new BadRequestError(
+    //     "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
+    //   );
+    // }
 
-    if (typeof creator_id !== "string") {
-      throw new BadRequestError("O campo 'creatorId' deve ser uma string");
-    }
+    // if (typeof creatorId !== "string") {
+    //   throw new BadRequestError("O campo 'creatorId' deve ser uma string");
+    // }
 
-    if (typeof content !== "string" || content.length < 1) {
-      throw new BadRequestError(
-        `O campo 'content' deve ter pelo menos 1 caracter.`
-      );
-    }
+    // if (typeof content !== "string" || content.length < 1) {
+    //   throw new BadRequestError(
+    //     `O campo 'content' deve ter pelo menos 1 caracter.`
+    //   );
+    // }
 
-    if (typeof likes !== "number") {
-      throw new BadRequestError(`O campo 'likes' deve ser um número`);
-    }
+    // if (typeof likes !== "number") {
+    //   throw new BadRequestError(`O campo 'likes' deve ser um número`);
+    // }
 
-    if (typeof dislikes_numbers !== "number") {
-      throw new BadRequestError(`O campo 'likes' deve ser um número`);
-    }
+    // if (typeof dislikesNumbers !== "number") {
+    //   throw new BadRequestError(`O campo 'likes' deve ser um número`);
+    // }
 
     // instanciando novo objeto
     const postDatabase = new PostDataBase();
     const postDBExists = await postDatabase.findPostById(id);
 
     if (postDBExists) {
-      //   res.status(400);
-      throw new Error("'id' já existe");
+      throw new BadRequestError("'id' já existe");
     }
 
     const post = new Post(
       id,
-      creator_id,
+      creatorId,
       content,
       likes,
-      dislikes_numbers,
+      dislikesNumbers,  
       new Date().toISOString(),
       new Date().toISOString()
     );
@@ -80,75 +86,121 @@ export class PostBussiness {
       created_at: post.getCreatedAt(),
       updated_at: post.getUpdatedAt(),
     };
+
     await postDatabase.insertPost(newPostDB);
 
-    return newPostDB;
+    const output: CreatePostOutputDTO = {
+      post:{
+        id: post.getId(),
+        creatorId: post.getCreatorId(),
+        content: post.getContent(),
+        likes: post.getLikes(),
+        dislikesNumbers: post.getDislikes(),
+        // createdAt: post.getCreatedAt(),
+        // updatedAt: post.getUpdatedAt()
+      }
+    }
+
+    return output;
   };
 
-  public updatePosts = async (input: any) => {
-    const { id, creatorId, content, likes, dislikesNumbers } = input;
+  public updatePosts = async (input: EditPostInputDTO):Promise<EditPostOutputDTO> => {
+    
+    const { idToEdit, id, creatorId, content, likes, dislikesNumbers } = input;
 
-    if (typeof id !== "string" || id.length < 4) {
-      throw new BadRequestError(
-        "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
-      );
-    }
+    // if (typeof id !== "string" || id.length < 4) {
+    //   throw new BadRequestError(
+    //     "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
+    //   );
+    // }
 
-    if (typeof creatorId !== "string" || creatorId.length < 3) {
-      throw new BadRequestError(
-        "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
-      );
-    }
+    // if (typeof creatorId !== "string" || creatorId.length < 3) {
+    //   throw new BadRequestError(
+    //     "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
+    //   );
+    // }
 
-    if (typeof content !== "string" || content.length < 1) {
-      throw new BadRequestError(
-        `O campo 'content' deve ter pelo menos 1 caracter.`
-      );
-    }
+    // if (typeof content !== "string" || content.length < 1) {
+    //   throw new BadRequestError(
+    //     `O campo 'content' deve ter pelo menos 1 caracter.`
+    //   );
+    // }
 
-    if (typeof likes !== "number") {
-      throw new BadRequestError(`O campo 'likes' deve ser um número`);
-    }
+    // if (typeof likes !== "number") {
+    //   throw new BadRequestError(`O campo 'likes' deve ser um número`);
+    // }
 
-    if (typeof dislikesNumbers !== "number") {
-      throw new BadRequestError(`O campo 'likes' deve ser um número`);
-    }
+    // if (typeof dislikesNumbers !== "number") {
+    //   throw new BadRequestError(`O campo 'likes' deve ser um número`);
+    // }
 
     const postDatabase = new PostDataBase();
-    const postDBExists = await postDatabase.findPostById(id);
+    const postDBExists = await postDatabase.findPostById(idToEdit);
 
     if (!postDBExists) {
-      //   res.status(404);
-      throw new Error("'id' não encontrado");
+       throw new NotFoundError("'id' não encontrado");
     }
 
-    postDBExists.id = id;
-    postDBExists.creator_id = creatorId;
-    postDBExists.content = content;
-    postDBExists.likes = likes;
-    postDBExists.dislikes_numbers = dislikesNumbers;
+    // postDBExists.id = id;
+    // postDBExists.creator_id = creatorId;
+    // postDBExists.content = content;
+    // postDBExists.likes = likes;
+    // postDBExists.dislikes_numbers = dislikesNumbers;
+
+    const post = new Post(
+      postDBExists.id,
+      postDBExists.creator_id,
+      postDBExists.content,
+      postDBExists.likes,
+      postDBExists.dislikes_numbers,
+      postDBExists.created_at,
+      postDBExists.updated_at
+    )
+
+    id && post.setId(id)
+    creatorId && post.setCreatorId(creatorId)
+    content && post.setContent(content)
+    likes && post.setLikes(likes)
+    dislikesNumbers && post.setDislikes(dislikesNumbers)
 
     await postDatabase.updatePost(postDBExists);
 
-    return postDBExists;
+    const output: EditPostOutputDTO={
+      message:"Post editado com sucesso",
+      post:{
+        id: post.getId(),
+        creatorId: post.getCreatorId(),
+        content: post.getContent(),
+        likes: post.getLikes(),
+        dislikesNumbers: post.getDislikes()
+      }
+    }
+
+    return output;
   };
 
-  public deletePosts = async (input: any) => {
-    const { id } = input;
+  public deletePosts = async (input: DeletePostInputDTO):Promise<DeletePostOutputDTO> => {
+    const { idToDelete } = input;
 
-    if (typeof id !== "string") {
-      throw new BadRequestError("O campo 'id' deve ser umas string");
-    }
+    // if (typeof id !== "string") {
+    //   throw new BadRequestError("O campo 'id' deve ser umas string");
+    // }
 
     const postDatabase = new PostDataBase();
-    const postDBExists = await postDatabase.findPostById(id);
+    const postDBExists = await postDatabase.findPostById(idToDelete);
 
     if (!postDBExists) {
-      throw new Error("Não foi possível encontrar o post");
+      throw new NotFoundError("Não foi possível encontrar o post");
     }
 
-    await postDatabase.deletePost(id);
+    await postDatabase.deletePost(idToDelete);
 
-    return postDBExists;
+    const output: DeletePostOutputDTO = {
+      message:"Post deletado com sucesso",
+      post:{
+        id: idToDelete
+      }
+    }
+      return output;
   };
 }
