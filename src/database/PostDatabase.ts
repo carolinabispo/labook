@@ -45,6 +45,8 @@ export class PostDataBase extends BaseDatabase {
   }
 
   public async deletePost(id: string) {
-    await BaseDatabase.connection(PostDataBase.TABLE_POST).del().where({ id });
+    await BaseDatabase.connection(PostDataBase.TABLE_POST)
+    .where({ id })
+    .delete();
   }
 }

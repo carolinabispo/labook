@@ -8,7 +8,6 @@ export type TUserDB = {
 };
 
 export type TPosts = {
-
   id: string;
   creator_id: string;
   content: string;
