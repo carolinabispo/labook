@@ -1,6 +1,12 @@
-import { DeleteUserInputDTO, DeleteUserOutputDTO } from './../dtos/deleteUser.dto';
-import { UserDatabase } from "../database/UserDatabase";
-import { CreateUserInputDTO, CreateUserOutputDTO } from "../dtos/createUser.dto";
+import { UserDatabase } from "./../database/UserDatabase";
+import {
+  DeleteUserInputDTO,
+  DeleteUserOutputDTO,
+} from "./../dtos/deleteUser.dto";
+import {
+  CreateUserInputDTO,
+  CreateUserOutputDTO,
+} from "../dtos/createUser.dto";
 import { EditUserInputDTO, EditUserOutputDTO } from "../dtos/editUser.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
@@ -8,11 +14,11 @@ import { User } from "../models/Users";
 import { TUserDB } from "../types";
 
 export class UserBussiness {
+  constructor(private userDatabase: UserDatabase) {}
+
   public getUsers = async (input: any) => {
-    // const q = req.params.q;
     const { q } = input;
-    const userDataBase = new UserDatabase();
-    const usersDB = await userDataBase.findUsers(q);
+    const usersDB = await this.userDatabase.findUsers(q);
 
     const users: User[] = usersDB.map(
       (usersDB) =>
@@ -28,41 +34,12 @@ export class UserBussiness {
     return users;
   };
 
-  public createUsers = async (input: CreateUserInputDTO):Promise<CreateUserOutputDTO> => {
+  public createUsers = async (
+    input: CreateUserInputDTO
+  ): Promise<CreateUserOutputDTO> => {
     const { id, name, email, password, role } = input;
 
-    // if (typeof id !== "string" || id.length < 3) {
-    //   throw new BadRequestError(
-    //     "O campo 'id' deve ser uma string com pelo menos 3 caracteres"
-    //   );
-    // }
-
-    // if (typeof name !== "string" || name.length < 3) {
-    //   throw new BadRequestError(
-    //     "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
-    //   );
-    // }
-
-    // if (!email || !email.includes("@")) {
-    //   throw new BadRequestError(
-    //     `O campo 'email' deve ser um endereço de e-mail válido`
-    //   );
-    // }
-
-    // if (typeof password !== "string" || password.length < 6) {
-    //   throw new BadRequestError(
-    //     `O campo 'password' deve ter pelo menos 6 caracteres.`
-    //   );
-    // }
-    // if (typeof role !== "string" || role.length < 4) {
-    //   throw new BadRequestError(
-    //     `O campo 'role' deve ser uma string com pelo menos 4 caracteres`
-    //   );
-    // }
-  
-    // instanciando novo objeto
-    const userDatabase = new UserDatabase();
-    const userDBExists = await userDatabase.findUserById(id);
+    const userDBExists = await this.userDatabase.findUserById(id);
 
     if (userDBExists) {
       throw new BadRequestError("'id' já existe");
@@ -86,67 +63,31 @@ export class UserBussiness {
       created_at: user.getCreatedAt(),
     };
 
-    await userDatabase.insertUser(newUserDB);
+    await this.userDatabase.insertUser(newUserDB);
 
-    const output: CreateUserOutputDTO={
-      user:{
-
+    const output: CreateUserOutputDTO = {
+      user: {
         id: user.getId(),
         name: user.getName(),
         email: user.getEmail(),
         role: user.getRole(),
         createdAt: user.getCreatedAt(),
-      }
-    }
+      },
+    };
 
     return output;
   };
 
-  public updateUsers = async (input: EditUserInputDTO):Promise<EditUserOutputDTO> => {
-    // const { newId, newName, newEmail, newPassword, newRole } = input;
-    const {idToEdit,id, name, email, password, role} = input
+  public updateUsers = async (
+    input: EditUserInputDTO
+  ): Promise<EditUserOutputDTO> => {
+    const { idToEdit, id, name, email, password, role } = input;
 
-    // if (typeof newId !== "string" || newId.length < 4) {
-    //   throw new BadRequestError(
-    //     "O campo 'id' deve ser uma string com pelo menos 4 caracteres"
-    //   );
-    // }
-
-    // if (typeof newPassword !== "string" || newName.length < 3) {
-    //   throw new BadRequestError(
-    //     "O campo 'nome' deve ser uma string com pelo menos 3 caracteres"
-    //   );
-    // }
-
-    // if (!newEmail || !newEmail.includes("@")) {
-    //   throw new BadRequestError(
-    //     `O campo 'email' deve ser um endereço de e-mail válido`
-    //   );
-    // }
-
-    // if (typeof newPassword !== "string" || newPassword.length < 6) {
-    //   throw new BadRequestError(
-    //     `O campo 'password' deve ter pelo menos 6 caracteres.`
-    //   );
-    // }
-    // if (typeof newRole !== "string" || newRole.length < 4) {
-    //   throw new BadRequestError(
-    //     `O campo 'role' deve ser uma string com pelo menos 4 caracteres`
-    //   );
-    // }
-
-    const userDatabase = new UserDatabase();
-    const userDBExists = await userDatabase.findUserById(idToEdit);
+    const userDBExists = await this.userDatabase.findUserById(idToEdit);
 
     if (!userDBExists) {
       throw new NotFoundError("'id' não encontrado");
     }
-
-    // userDBExists.id = newId;
-    // userDBExists.name = newName;
-    // userDBExists.email = newEmail;
-    // userDBExists.password = newPassword;
-    // userDBExists.role = newRole;
 
     const user = new User(
       userDBExists.id,
@@ -155,63 +96,58 @@ export class UserBussiness {
       userDBExists.password,
       userDBExists.role,
       userDBExists.created_at
-      )
+    );
 
-      id && user.setId(id)
-      name && user.setName(name)
-      email && user.setEmail(email)
-      password && user.setPassword(password)
-      role && user.setRole(role)
-      
+    id && user.setId(id);
+    name && user.setName(name);
+    email && user.setEmail(email);
+    password && user.setPassword(password);
+    role && user.setRole(role);
 
-      const updatedUser: TUserDB = {
-        id: user.getId(),
-        name: user.getName(),
-        email: user.getEmail(),
-        password: user.getPassword(),
-        role: user.getRole(),
-        created_at: user.getCreatedAt(),
-      }
+    const updatedUser: TUserDB = {
+      id: user.getId(),
+      name: user.getName(),
+      email: user.getEmail(),
+      password: user.getPassword(),
+      role: user.getRole(),
+      created_at: user.getCreatedAt(),
+    };
 
-    await userDatabase.updateUser(userDBExists);
+    await this.userDatabase.updateUser(userDBExists);
 
     const output: EditUserOutputDTO = {
       message: "User editado  com sucesso",
-      user:{
+      user: {
         id: user.getId(),
         name: user.getName(),
         email: user.getEmail(),
         password: user.getPassword(),
         role: user.getRole(),
-        
-      }
-    }
+      },
+    };
 
     return output;
   };
 
-  public deleteUsers = async (input: DeleteUserInputDTO): Promise<DeleteUserOutputDTO> => {
+  public deleteUsers = async (
+    input: DeleteUserInputDTO
+  ): Promise<DeleteUserOutputDTO> => {
     const { idToDelete } = input;
 
-    // if (typeof id !== "string") {
-    //   throw new BadRequestError("O campo 'id' deve ser umas string");
-    // }
-
-    const userDatabase = new UserDatabase();
-    const userDBExists = await userDatabase.findUserById(idToDelete);
+    const userDBExists = await this.userDatabase.findUserById(idToDelete);
 
     if (!userDBExists) {
       throw new NotFoundError("Não foi possível encontrar o usuário");
     }
 
-    await userDatabase.deleteUser(idToDelete);
+    await this.userDatabase.deleteUser(idToDelete);
 
     const output: DeleteUserOutputDTO = {
-      message:"usuário deletado com sucesso",
-      user:{
-        id: idToDelete
-      }
-    }
+      message: "usuário deletado com sucesso",
+      user: {
+        id: idToDelete,
+      },
+    };
 
     return output;
   };
