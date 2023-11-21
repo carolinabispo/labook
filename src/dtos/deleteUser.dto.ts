@@ -14,5 +14,4 @@ export interface DeleteUserOutputDTO{
 
 export const DeleteUserSchema = z.object({
     idToDelete: z.string().min(3),
-    // id: z.string().min(3)
-}).transform(data=> data as DeleteUserInputDTO)
+ }).transform(data=> data as DeleteUserInputDTO)
