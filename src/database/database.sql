@@ -72,3 +72,25 @@ VALUES
 
 SELECT * FROM users;
 SELECT * FROM posts
+
+CREATE TABLE
+likes_dislikes(
+    likes_dislikes_id PRIMARY KEY UNIQUE NOT NULL,
+    user_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    like NUMBER  NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (post_id) REFERENCES posts(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+    );
+
+    DROP TABLE likes_dislikes;
+
+SELECT * FROM likes_dislikes
+
+    INSERT INTO likes_dislikes (likes_dislikes_id, user_id, post_id, like) 
+    VALUES ('l001', 'u001','p001', 5),
+    ('l002', 'u003','p002', 6)
+
+    DELETE FROM likes_dislikes WHERE likes_dislikes_id LIKE '%l001%'

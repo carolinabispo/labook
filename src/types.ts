@@ -16,3 +16,11 @@ export type TPosts = {
   created_at: string;
   updated_at: string;
 };
+
+export type LikeDB = {
+  likes_dislikes_id: string,
+  user_id: string,
+  post_id:string,
+  like: number,
+  dislike: number
+}

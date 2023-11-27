@@ -37,10 +37,10 @@ export class PostDataBase extends BaseDatabase {
     await BaseDatabase.connection(PostDataBase.TABLE_POST)
       .where({ id: newPost.id })
       .update({
-        creatorId: newPost.creator_id,
+        creator_id: newPost.creator_id,
         content: newPost.content,
         likes: newPost.likes,
-        dislikesNumbers: newPost.dislikes_numbers,
+        dislikes_numbers: newPost.dislikes_numbers,
       });
   }
 

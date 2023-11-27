@@ -113,7 +113,7 @@ export class UserBussiness {
       created_at: user.getCreatedAt(),
     };
 
-    await this.userDatabase.updateUser(userDBExists);
+    await this.userDatabase.updateUser(updatedUser);
 
     const output: EditUserOutputDTO = {
       message: "User editado  com sucesso",
