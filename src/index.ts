@@ -5,6 +5,7 @@ import cors from "cors";
 import { PostController } from "./controller/PostController";
 import { userRouter } from "./router/userRouter";
 import { postsRouter } from "./router/postsRouter";
+import { likeRouter } from "./router/likeRouter";
 
 const app = express();
 
@@ -21,22 +22,13 @@ app.listen(3003, () => {
 
 // -------------------------------CRUD USERS---------------------
 
-// const userController = new UserController();
-// app.get("/users", userController.getUsers);
-// app.post("/users", userController.createUsers);
-// app.put("/users/:id", userController.updateUsers);
-// app.delete("/users/:id", userController.deleteUsers);
-
 app.use("/users",userRouter)
 
 // // ---------------------------CRUD POSTS ----------------------------------------
-// const postController = new PostController();
-
-// app.get("/posts", postController.getPosts);
-// app.post("/posts", postController.createPosts);
-// app.put("/posts/:id", postController.updatePosts);
-// app.delete("/posts/:id", postController.deletePosts);
 
 app.use("/posts",postsRouter)
 
+// ------------------- CRUD LIKES / DISLIKES ------------
+
+app.use("/likes",likeRouter)
 

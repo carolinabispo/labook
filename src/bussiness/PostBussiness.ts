@@ -75,9 +75,7 @@ constructor(
         creatorId: post.getCreatorId(),
         content: post.getContent(),
         likes: post.getLikes(),
-        dislikesNumbers: post.getDislikes(),
-        // createdAt: post.getCreatedAt(),
-        // updatedAt: post.getUpdatedAt()
+        dislikesNumbers: post.getDislikes()
       }
     }
 
@@ -87,9 +85,9 @@ constructor(
   public updatePosts = async (input: EditPostInputDTO):Promise<EditPostOutputDTO> => {
     
     const { idToEdit, id, creatorId, content, likes, dislikesNumbers } = input;
-
-    const postDatabase = new PostDataBase();
-    const postDBExists = await postDatabase.findPostById(idToEdit);
+    
+    // const postDatabase = new PostDatabase();
+    const postDBExists = await this.postDatabase.findPostById(idToEdit);
 
     if (!postDBExists) {
        throw new NotFoundError("'id' não encontrado");
@@ -111,7 +109,17 @@ constructor(
     likes && post.setLikes(likes)
     dislikesNumbers && post.setDislikes(dislikesNumbers)
 
-    await postDatabase.updatePost(postDBExists);
+    const newPostDB: TPosts = {
+      id: post.getId(),
+      creator_id: post.getCreatorId(),
+      content: post.getContent(),
+      likes: post.getLikes(),
+      dislikes_numbers: post.getDislikes(),
+      created_at: post.getCreatedAt(),
+      updated_at: post.getUpdatedAt(),
+    };
+
+    await this.postDatabase.updatePost(newPostDB);
 
     const output: EditPostOutputDTO={
       message:"Post editado com sucesso",
@@ -130,14 +138,13 @@ constructor(
   public deletePosts = async (input: DeletePostInputDTO):Promise<DeletePostOutputDTO> => {
     const { idToDelete } = input;
 
-    const postDatabase = new PostDataBase();
-    const postDBExists = await postDatabase.findPostById(idToDelete);
+    const postDBExists = await this.postDatabase.findPostById(idToDelete);
 
     if (!postDBExists) {
       throw new NotFoundError("Não foi possível encontrar o post");
     }
 
-    await postDatabase.deletePost(idToDelete);
+    await this.postDatabase.deletePost(idToDelete);
 
     const output: DeletePostOutputDTO = {
       message:"Post deletado com sucesso",
