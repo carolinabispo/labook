@@ -1,18 +1,18 @@
 export class Likes {
     constructor(
-       private likesDislikesId: string,
+       private likeId: string,
        private userId: string,
        private postId:string,
        private like: number,
-       private dislike: number
+      //  private dislike: number
     ) {}
   
     public getId(): string {
-      return this.likesDislikesId
+      return this.likeId
     }
   
     public setId(newValue: string): void {
-      this.likesDislikesId = newValue
+      this.likeId = newValue
     }
   
     public getUserId(): string {
@@ -39,11 +39,11 @@ export class Likes {
       this.like = newValue
     }
 
-    public getDislike(): number {
-      return this.dislike
-    }
+    // public getDislike(): number {
+    //   return this.dislike
+    // }
 
-    public setDislike(newValue: number): void {
-      this.dislike = newValue
-    }
+    // public setDislike(newValue: number): void {
+    //   this.dislike = newValue
+    // }
   }

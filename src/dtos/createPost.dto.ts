@@ -30,4 +30,4 @@ export const CreatePostSchema = z.object({
     dislikesNumbers: z.number().gte(0),
     // createdAt: z.string().optional(),
     // updatedAt: z.string().optional()
-})
+}).transform(data => data as CreatePostInputDTO)

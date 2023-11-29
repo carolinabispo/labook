@@ -45,7 +45,7 @@ constructor(
         content: req.body.content,
         likes: req.body.likes,
         dislikesNumbers: req.body.dislikesNumbers,
-            })
+        })
 
 
       const output = await this.postBussiness.createPosts(input);

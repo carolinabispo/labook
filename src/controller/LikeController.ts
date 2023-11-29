@@ -1,6 +1,8 @@
+import { CreateLikeSchema } from './../dtos/createLike.dto';
 import { Request, Response, response } from 'express';
-import { LikeBussiness } from '../bussiness/LikeDislikeBussiness';
+import { LikeBussiness } from '../bussiness/LikeBussiness';
 import { BaseError } from '../errors/BaseError';
+import { ZodError } from 'zod';
 export class LikeController {
 
   constructor(
@@ -30,4 +32,35 @@ export class LikeController {
       }
     }
   }
+
+  public createLikes =async (req: Request, res: Response) => {
+    
+try {
+   const input = CreateLikeSchema.parse({
+    likeId: req.body.likeId,
+    userId: req.body.userId,
+    postId: req.body.postId,
+    like: req.body.like
+   })
+
+   const output = await this.likeBussiness.createLike(input)
+
+   res.status(201).send(output)
+
+
+
+} catch (error) {
+  console.log(error);
+
+      if (error instanceof ZodError) {
+        res.status(400).send(error.issues)
+     } else if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message)
+     } else {
+        res.status(500).send("Erro inesperado")
+     }
+}
+
+  }
+
 }
