@@ -18,9 +18,9 @@ export type TPosts = {
 };
 
 export type LikeDB = {
-  likes_dislikes_id: string,
+  like_id: string,
   user_id: string,
-  post_id:string,
+  post_id: string,
   like: number,
-  dislike: number
+  // dislike: number
 }

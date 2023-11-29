@@ -75,10 +75,10 @@ SELECT * FROM posts
 
 CREATE TABLE
 likes_dislikes(
-    likes_dislikes_id PRIMARY KEY UNIQUE NOT NULL,
+    like_id STRING PRIMARY KEY UNIQUE NOT NULL,
     user_id TEXT NOT NULL,
     post_id TEXT NOT NULL,
-    like NUMBER  NOT NULL,
+    like INTEGER  NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (post_id) REFERENCES posts(id)
     ON UPDATE CASCADE
@@ -87,9 +87,8 @@ likes_dislikes(
 
     DROP TABLE likes_dislikes;
 
-SELECT * FROM likes_dislikes
 
-    INSERT INTO likes_dislikes (likes_dislikes_id, user_id, post_id, like) 
+    INSERT INTO likes_dislikes (like_id, user_id, post_id, like) 
     VALUES ('l001', 'u001','p001', 5),
     ('l002', 'u003','p002', 6)
 

@@ -1,7 +1,7 @@
 import { LikeDatabase } from './../database/LikeDatabase';
 import  express  from 'express';
 import { LikeController } from '../controller/LikeController';
-import { LikeBussiness } from '../bussiness/LikeDislikeBussiness';
+import { LikeBussiness } from '../bussiness/LikeBussiness';
 
 export const likeRouter = express.Router()
 
@@ -10,3 +10,4 @@ const likeControlle = new LikeController(
 )
 
 likeRouter.get("/", likeControlle.getLikesDilikes)
+likeRouter.post("/", likeControlle.createLikes)

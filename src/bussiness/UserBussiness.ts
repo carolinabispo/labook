@@ -1,3 +1,5 @@
+import { TokenPayload } from './../services/TokenManager';
+import { IdGenerator } from '../services/idGenerator';
 import { UserDatabase } from "./../database/UserDatabase";
 import {
   DeleteUserInputDTO,
@@ -10,11 +12,50 @@ import {
 import { EditUserInputDTO, EditUserOutputDTO } from "../dtos/editUser.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
-import { User } from "../models/Users";
+import { USER_ROLES, User } from "../models/Users";
 import { TUserDB } from "../types";
+import { SignupInputDTO, SignupOutputDTO } from '../dtos/signup.dto';
+import { TokenManager } from '../services/TokenManager';
 
 export class UserBussiness {
-  constructor(private userDatabase: UserDatabase) {}
+  constructor(
+    private userDatabase: UserDatabase,
+    private idGenerator: IdGenerator,
+  ) {}
+
+public signup =async (input:SignupInputDTO): Promise<SignupOutputDTO> => {
+  const { name, email, password } = input
+
+  // const userDBExists = await this.userDatabase.findUserById(id)
+
+  // if (userDBExists) {
+  //   throw new BadRequestError("'id' já existe")
+  // }
+  const id = this.idGenerator.generate()
+
+
+  const newUser = new User(
+    id,
+    input.email,
+    input.password,
+    password,
+    USER_ROLES.NORMAL, // só é possível criar users com contas normais
+    new Date().toISOString()
+  )
+
+  const newUserDB = newUser.toDBModel()
+  await this.userDatabase.insertUser(newUserDB)
+
+
+  const output: SignupOutputDTO = {
+    message: "Cadastro realizado com sucesso",
+    token: "token"
+  }
+
+  return output
+  
+}
+
 
   public getUsers = async (input: any) => {
     const { q } = input;
@@ -27,7 +68,7 @@ export class UserBussiness {
           usersDB.name,
           usersDB.email,
           usersDB.password,
-          usersDB.role,
+          usersDB.role as USER_ROLES,
           usersDB.created_at
         )
     );
@@ -50,7 +91,7 @@ export class UserBussiness {
       name,
       email,
       password,
-      role,
+      role as USER_ROLES,
       new Date().toISOString()
     );
 
@@ -94,7 +135,7 @@ export class UserBussiness {
       userDBExists.name,
       userDBExists.email,
       userDBExists.password,
-      userDBExists.role,
+      userDBExists.role as USER_ROLES,
       userDBExists.created_at
     );
 
@@ -102,7 +143,7 @@ export class UserBussiness {
     name && user.setName(name);
     email && user.setEmail(email);
     password && user.setPassword(password);
-    role && user.setRole(role);
+    role && user.setRole(role as USER_ROLES);
 
     const updatedUser: TUserDB = {
       id: user.getId(),
