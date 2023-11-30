@@ -1,24 +1,12 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import { TokenPayload } from '../models/Users'
 
 dotenv.config()
 
-// esse enum pode ser alocado para outro arquivo
-export enum USER_ROLES {
-    NORMAL = "NORMAL",
-    ADMIN = "ADMIN"
-}
-
-// essa interface também pode ser alocada para outro arquivo
-export interface TokenPayload {
-    id: string,
-		name: string,
-    role: USER_ROLES
-}
-
 export class TokenManager {
 
-		// converte o objeto de dados (payload) para um token string
+    // converte o objeto de dados (payload) para um token string
     public createToken = (payload: TokenPayload): string => {
         const token = jwt.sign(
             payload,

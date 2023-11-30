@@ -1,11 +1,13 @@
 import { ZodError } from "zod";
-import { CreateUserSchema } from "../dtos/createUser.dto";
+import { CreateUserSchema } from "../dtos/user/createUser.dto";
 import { BaseError } from "../errors/BaseError";
 import { UserBussiness } from "./../bussiness/UserBussiness";
 import { Request, Response } from "express";
-import { EditUserSchema } from "../dtos/editUser.dto";
-import { DeleteUserSchema } from "../dtos/deleteUser.dto";
-import { SignupSchema } from "../dtos/signup.dto";
+import { EditUserSchema } from "../dtos/user/editUser.dto";
+import { DeleteUserSchema } from "../dtos/user/deleteUser.dto";
+import { SignupSchema } from "../dtos/user/signup.dto";
+import { LoginSchema } from "../dtos/user/login.dto";
+import { GetUserSchema } from "../dtos/user/getUsers.dto";
 
 export class UserController {
 
@@ -38,11 +40,33 @@ public signup =async (req:Request, res: Response) => {
   }
 }
 
+public login =async (req: Request, res: Response) => {
+  try {
+    const input = LoginSchema.parse({
+      email: req.body.email,
+      password: req.body.password
+    })
+
+
+  } catch (error) {
+    console.log(error)
+
+      if (error instanceof ZodError) {
+        res.status(400).send(error.issues)
+      } else if (error instanceof BaseError) {
+        res.status(error.statusCode).send(error.message)
+      } else {
+        res.status(500).send("Erro inesperado")
+      }
+  }
+}
+
   public getUsers = async (req: Request, res: Response) => {
     try {
-      const input = {
+      const input = GetUserSchema.parse({
         q: req.query.q as string | undefined,
-      };
+        token: req.headers.authorization
+      })
 
       // const userBussiness = new UserBussiness();
       const response = await this.userBussiness.getUsers(input);

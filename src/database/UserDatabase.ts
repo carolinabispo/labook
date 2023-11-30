@@ -22,10 +22,17 @@ export class UserDatabase extends BaseDatabase {
     return usersDB;
   }
 
-  public async findUserById(id: string) {
+  public async findUserById(id: string): Promise<TUserDB | undefined> {
     const [userDB]: TUserDB[] | undefined[] = await BaseDatabase.connection(
       UserDatabase.TABLE_USERS
     ).where({ id });
+
+    return userDB;
+  }
+  public async findUserByEmail(email: string):Promise<TUserDB | undefined> {
+    const [userDB]: TUserDB[] | undefined[] = await BaseDatabase.connection(
+      UserDatabase.TABLE_USERS
+    ).where({ email });
 
     return userDB;
   }

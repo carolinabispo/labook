@@ -1,78 +1,117 @@
-import { TokenPayload } from './../services/TokenManager';
-import { IdGenerator } from '../services/idGenerator';
+import { TokenPayload } from "./../models/Users";
+import { IdGenerator } from "../services/idGenerator";
 import { UserDatabase } from "./../database/UserDatabase";
 import {
   DeleteUserInputDTO,
   DeleteUserOutputDTO,
-} from "./../dtos/deleteUser.dto";
+} from "../dtos/user/deleteUser.dto";
 import {
   CreateUserInputDTO,
   CreateUserOutputDTO,
-} from "../dtos/createUser.dto";
-import { EditUserInputDTO, EditUserOutputDTO } from "../dtos/editUser.dto";
+} from "../dtos/user/createUser.dto";
+import { EditUserInputDTO, EditUserOutputDTO } from "../dtos/user/editUser.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { USER_ROLES, User } from "../models/Users";
 import { TUserDB } from "../types";
-import { SignupInputDTO, SignupOutputDTO } from '../dtos/signup.dto';
-import { TokenManager } from '../services/TokenManager';
+import { SignupInputDTO, SignupOutputDTO } from "../dtos/user/signup.dto";
+import { TokenManager } from "../services/TokenManager";
+import { LoginInputDTO, LoginOutputDTO } from "../dtos/user/login.dto";
+import { GetUserInputDTO, GetUserOutputDTO } from "../dtos/user/getUsers.dto";
 
 export class UserBussiness {
   constructor(
     private userDatabase: UserDatabase,
     private idGenerator: IdGenerator,
+    private tokenManager: TokenManager
   ) {}
 
-public signup =async (input:SignupInputDTO): Promise<SignupOutputDTO> => {
-  const { name, email, password } = input
+  public signup = async (input: SignupInputDTO): Promise<SignupOutputDTO> => {
+    const { name, email, password } = input;
 
-  // const userDBExists = await this.userDatabase.findUserById(id)
+    // const userDBExists = await this.userDatabase.findUserById(id)
 
-  // if (userDBExists) {
-  //   throw new BadRequestError("'id' já existe")
-  // }
-  const id = this.idGenerator.generate()
+    // if (userDBExists) {
+    //   throw new BadRequestError("'id' já existe")
+    // }
+    const id = this.idGenerator.generate();
 
+    const newUser = new User(
+      id,
+      input.email,
+      input.password,
+      password,
+      USER_ROLES.NORMAL, // só é possível criar users com contas normais
+      new Date().toISOString()
+    );
 
-  const newUser = new User(
-    id,
-    input.email,
-    input.password,
-    password,
-    USER_ROLES.NORMAL, // só é possível criar users com contas normais
-    new Date().toISOString()
-  )
+    const newUserDB = newUser.toDBModel();
+    await this.userDatabase.insertUser(newUserDB);
 
-  const newUserDB = newUser.toDBModel()
-  await this.userDatabase.insertUser(newUserDB)
+    const payload: TokenPayload = {
+      id: newUser.getId(),
+      name: newUser.getName(),
+      role: newUser.getRole(),
+    };
 
+    const token = this.tokenManager.createToken(payload);
 
-  const output: SignupOutputDTO = {
-    message: "Cadastro realizado com sucesso",
-    token: "token"
+    const output: SignupOutputDTO = {
+      message: "Cadastro realizado com sucesso",
+      token: token,
+    };
+
+    return output;
+  };
+
+  public login =async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
+    const {email, password} = input
+
+    const userDB = await this.userDatabase.findUserByEmail(email)
+
+    if(password !== userDB?.email){
+      throw new BadRequestError("'email' ou 'password' incorretos")
+    }
+    
+
+    const output: LoginOutputDTO ={
+      message:"Login realizado com sucesso",
+      token: 'token'
+    }
+
+    return output
+
   }
 
-  return output
-  
-}
+  public getUsers = async (input: GetUserInputDTO):Promise<GetUserOutputDTO> => {
+    const { q, token } = input;
 
+    const payload = this.tokenManager.getPayload(token)
+    
+    if(payload === null){
+      throw new BadRequestError("token inválido")
+    }
 
-  public getUsers = async (input: any) => {
-    const { q } = input;
+    if(payload.role !== USER_ROLES.ADMIN){
+      throw new BadRequestError("Somente admin pode acessar esse recurso")
+    }
+
     const usersDB = await this.userDatabase.findUsers(q);
 
-    const users: User[] = usersDB.map(
-      (usersDB) =>
-        new User(
-          usersDB.id,
-          usersDB.name,
-          usersDB.email,
-          usersDB.password,
-          usersDB.role as USER_ROLES,
-          usersDB.created_at
-        )
-    );
-    return users;
+    const users = usersDB.map((userDB) => {
+         const user = new User(
+          userDB.id,
+          userDB.name,
+          userDB.email,
+          userDB.password,
+          userDB.role as USER_ROLES,
+          userDB.created_at
+      )
+
+      return user.toBusinessModel()
+    })
+    const output: GetUserOutputDTO = users
+    return output
   };
 
   public createUsers = async (

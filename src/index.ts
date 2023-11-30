@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use(cors());
 app.listen(Number(process.env.PORT || 3003), () => {
-  console.log(`Servidor rodando na porta ${process.env.PORT}`)
+  console.log(`Servidor rodando na porta ${Number( process.env.PORT)|| undefined}`)
 })
 
 // app.get("/ping", (req: Request, res: Response) => {
