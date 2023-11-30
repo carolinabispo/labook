@@ -1,14 +1,14 @@
 import { UserDatabase } from './../database/UserDatabase';
-import { DeletePostInputDTO } from './../dtos/deletePost.dto';
+import { DeletePostInputDTO } from '../dtos/post/deletePost.dto';
 import { PostDataBase } from "../database/PostDatabase";
-import { CreatePostInputDTO, CreatePostOutputDTO } from "../dtos/createPost.dto";
+import { CreatePostInputDTO, CreatePostOutputDTO } from "../dtos/post/createPost.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { Post } from "../models/Posts";
 import { TPosts } from "../types";
-import { EditPostInputDTO, EditPostOutputDTO } from '../dtos/editPost.dto';
-import { EditUserOutputDTO } from '../dtos/editUser.dto';
+import { EditPostInputDTO, EditPostOutputDTO } from '../dtos/post/editPost.dto';
+import { EditUserOutputDTO } from '../dtos/user/editUser.dto';
 import { NotFoundError } from '../errors/NotFoundError';
-import { DeletePostOutputDTO } from '../dtos/deletePost.dto';
+import { DeletePostOutputDTO } from '../dtos/post/deletePost.dto';
 
 export class PostBussiness {
 
