@@ -45,6 +45,7 @@ constructor(
         content: req.body.content,
         likes: req.body.likes,
         dislikesNumbers: req.body.dislikesNumbers,
+        token: req.headers.authorization
         })
 
 
