@@ -1,5 +1,6 @@
 import { UserBussiness } from '../bussiness/UserBussiness';
 import { UserDatabase } from '../database/UserDatabase';
+import { HashManager } from '../services/HashManager';
 import { TokenManager } from '../services/TokenManager';
 import { IdGenerator } from '../services/idGenerator';
 import { UserController } from './../controller/UserController';
@@ -11,7 +12,8 @@ const userController = new UserController(
     new UserBussiness(
         new UserDatabase,
         new IdGenerator(),
-        new TokenManager()
+        new TokenManager(),
+        new HashManager()
         )
 )
 

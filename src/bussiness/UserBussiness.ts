@@ -18,29 +18,33 @@ import { SignupInputDTO, SignupOutputDTO } from "../dtos/user/signup.dto";
 import { TokenManager } from "../services/TokenManager";
 import { LoginInputDTO, LoginOutputDTO } from "../dtos/user/login.dto";
 import { GetUserInputDTO, GetUserOutputDTO } from "../dtos/user/getUsers.dto";
+import { HashManager } from "../services/HashManager";
 
 export class UserBussiness {
   constructor(
     private userDatabase: UserDatabase,
     private idGenerator: IdGenerator,
-    private tokenManager: TokenManager
+    private tokenManager: TokenManager,
+    private hashManager: HashManager
   ) {}
 
   public signup = async (input: SignupInputDTO): Promise<SignupOutputDTO> => {
     const { name, email, password } = input;
 
-    // const userDBExists = await this.userDatabase.findUserById(id)
+    const userDBExists = await this.userDatabase.findUserByEmail(email)
 
-    // if (userDBExists) {
-    //   throw new BadRequestError("'id' já existe")
-    // }
+    if (userDBExists) {
+      throw new BadRequestError("'email' já existe")
+    }
+    const hashedPassword = await this.hashManager.hash(password)
+
     const id = this.idGenerator.generate();
 
     const newUser = new User(
       id,
-      input.email,
-      input.password,
-      password,
+      name,
+      email,
+      hashedPassword,
       USER_ROLES.NORMAL, // só é possível criar users com contas normais
       new Date().toISOString()
     );
@@ -65,23 +69,55 @@ export class UserBussiness {
   };
 
   public login =async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
-    const {email, password} = input
+    const { email, password } = input
 
     const userDB = await this.userDatabase.findUserByEmail(email)
 
-    if(password !== userDB?.email){
+    if (!userDB) {
+      throw new NotFoundError("'email' não encontrado")
+    }
+
+    // if (password !== userDB.password) {
+    //   throw new BadRequestError("'email' ou 'password' incorretos")
+    // }
+
+		// o password hasheado está no banco de dados
+		const hashedPassword = userDB.password
+
+		// o serviço hashManager analisa o password do body (plaintext) e o hash
+		const isPasswordCorrect = await this.hashManager.compare(password, hashedPassword)
+
+		// validamos o resultado
+		if (!isPasswordCorrect) {
       throw new BadRequestError("'email' ou 'password' incorretos")
     }
-    
 
-    const output: LoginOutputDTO ={
-      message:"Login realizado com sucesso",
-      token: 'token'
+    const user = new User(
+      userDB.id,
+      userDB.name,
+      userDB.email,
+      userDB.password,
+      userDB.role as USER_ROLES,
+      userDB.created_at
+    )
+
+    const payload: TokenPayload = {
+      id: user.getId(),
+      name: user.getName(),
+      role: user.getRole()
     }
 
-    return output
+    const token = this.tokenManager.createToken(payload)
 
+    const output: LoginOutputDTO = {
+      message: "Login realizado com sucesso",
+      token
+    }
+
+   return output
   }
+
+  
 
   public getUsers = async (input: GetUserInputDTO):Promise<GetUserOutputDTO> => {
     const { q, token } = input;

@@ -47,6 +47,10 @@ public login =async (req: Request, res: Response) => {
       password: req.body.password
     })
 
+    const output = await this.userBussiness.login(input)
+
+    res.status(200).send(output);
+
 
   } catch (error) {
     console.log(error)

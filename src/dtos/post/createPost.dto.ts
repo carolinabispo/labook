@@ -17,6 +17,7 @@ export interface CreatePostOutputDTO{
         content:string,
         likes:number,
         dislikesNumbers:number,
+        token: string
         // createdAt:string,
         // updatedAt:string,
     }
@@ -28,6 +29,7 @@ export const CreatePostSchema = z.object({
     content: z.string(),
     likes: z.number().gt(0),
     dislikesNumbers: z.number().gte(0),
+    token: z.string().min(1)
     // createdAt: z.string().optional(),
     // updatedAt: z.string().optional()
 }).transform(data => data as CreatePostInputDTO)
