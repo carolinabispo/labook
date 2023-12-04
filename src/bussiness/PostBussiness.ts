@@ -148,53 +148,6 @@ postDB.name,
 
     return output
 
-    //   // const postDatabase = new PostDatabase();
-    //   const postDBExists = await this.postDatabase.findPostById(idToEdit);
-
-    //   if (!postDBExists) {
-    //      throw new NotFoundError("'id' não encontrado");
-    //   }
-
-    //   const post = new Post(
-    //     postDBExists.id,
-    //     postDBExists.creator_id,
-    //     postDBExists.content,
-    //     postDBExists.likes,
-    //     postDBExists.dislikes_numbers,
-    //     postDBExists.created_at,
-    //     postDBExists.updated_at
-    //   )
-
-    //   id && post.setId(id)
-    //   creatorId && post.setCreatorId(creatorId)
-    //   content && post.setContent(content)
-    //   likes && post.setLikes(likes)
-    //   dislikesNumbers && post.setDislikes(dislikesNumbers)
-
-    //   const newPostDB: TPosts = {
-    //     id: post.getId(),
-    //     creator_id: post.getCreatorId(),
-    //     content: post.getContent(),
-    //     likes: post.getLikes(),
-    //     dislikes_numbers: post.getDislikes(),
-    //     created_at: post.getCreatedAt(),
-    //     updated_at: post.getUpdatedAt(),
-    //   };
-
-    //   await this.postDatabase.updatePost(newPostDB);
-
-    //   const output: EditPostOutputDTO={
-    //     message:"Post editado com sucesso",
-    //     post:{
-    //       id: post.getId(),
-    //       creatorId: post.getCreatorId(),
-    //       content: post.getContent(),
-    //       likes: post.getLikes(),
-    //       dislikesNumbers: post.getDislikes()
-    //     }
-    //   }
-
-    //   return output;
   };
 
   public deletePosts = async (
