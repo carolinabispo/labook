@@ -38,6 +38,7 @@ CREATE Table
     posts(
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         creator_id TEXT NOT NULL,
+        name TEXT NOT NULL,
         content TEXT UNIQUE NOT NULL,
         likes REAL NOT NULL,
         dislikes_numbers REAL NOT NULL,
@@ -62,13 +63,14 @@ INSERT INTO
     posts(
         id,
         creator_id,
+        name,
         content,
         likes,
         dislikes_numbers
     )
 VALUES
-('p001', 'u001', 'oiii', 5, 1),
-('p002', 'u002', 'oi oi tudo bem', 4, 2);
+('p001', 'u001','Catarina', 'oiii', 5, 1),
+('p002', 'u002','Joao', 'oi oi tudo bem', 4, 2);
 
 SELECT * FROM users;
 SELECT * FROM posts

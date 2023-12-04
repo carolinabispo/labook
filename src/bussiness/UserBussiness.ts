@@ -45,7 +45,7 @@ export class UserBussiness {
       name,
       email,
       hashedPassword,
-      USER_ROLES.NORMAL, // só é possível criar users com contas normais
+      USER_ROLES.NORMAL, // só é possível criar users com contas normal
       new Date().toISOString()
     );
 

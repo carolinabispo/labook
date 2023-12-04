@@ -2,16 +2,14 @@ import z from 'zod'
 
 export interface DeletePostInputDTO {
     idToDelete: string,
-    id: string
+token: string
 }
 
 export interface DeletePostOutputDTO {
     message: string,
-    post:{
-        id:string
-    }
 }
 
 export const DeletePostSchema = z.object({
-    idToDelete: z.string().min(3)
+    idToDelete: z.string().min(3),
+    token: z.string().min(1),
 }).transform(data => data as DeletePostInputDTO)
